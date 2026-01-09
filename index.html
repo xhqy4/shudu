@@ -133,20 +133,34 @@
         /* 游戏板 */
         .sudoku-board {
             display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            grid-template-rows: repeat(9, 1fr);
-            gap: 1px;
-            background: #333;
-            border: 3px solid #333;
-            border-radius: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 3px;
+            border: 4px solid #2c3e50;
+            border-radius: 14px;
             margin: 20px auto;
             width: 100%;
             max-width: 450px;
             aspect-ratio: 1;
+            background: #2c3e50;
+            padding: 3px;
+        }
+
+        /* 3x3区域容器 */
+        .subgrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            background: #ffffff;
+            border: 4px solid #3498db;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
         .cell {
-            background: #fff;
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -155,57 +169,62 @@
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
+            border: 1px solid #dee2e6;
+            padding: 5px;
         }
 
-        .cell:nth-child(3n+1):nth-child(-n+9),
-        .cell:nth-child(3n+1):nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(3n+1):nth-child(n+37):nth-child(-n+45),
-        .cell:nth-child(3n+1):nth-child(n+55):nth-child(-n+63),
-        .cell:nth-child(3n+1):nth-child(n+73):nth-child(-n+81) {
-            border-left: 3px solid #333;
+        /* 3x3区域背景色交替，增强视觉区分 */
+        .subgrid:nth-child(odd) .cell {
+            background: #f0f4f8;
         }
 
-        .cell:nth-child(9n+3),
-        .cell:nth-child(9n+6),
-        .cell:nth-child(9n+9) {
-            border-right: 3px solid #333;
+        .subgrid:nth-child(even) .cell {
+            background: #ffffff;
         }
 
-        .cell:nth-child(n+1):nth-child(-n+9),
-        .cell:nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(n+37):nth-child(-n+45),
-        .cell:nth-child(n+55):nth-child(-n+63),
-        .cell:nth-child(n+73):nth-child(-n+81) {
-            border-top: 3px solid #333;
+        /* 增强子网格边框对比度 */
+        .subgrid:nth-child(odd) {
+            border-color: #2980b9;
         }
 
-        .cell:nth-child(n+28):nth-child(-n+36),
-        .cell:nth-child(n+55):nth-child(-n+63) {
-            border-bottom: 3px solid #333;
+        .subgrid:nth-child(even) {
+            border-color: #16a085;
+        }
+
+        /* 子网格悬停效果 */
+        .subgrid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
 
         .cell.fixed {
             color: #2c3e50;
             background: #ecf0f1;
             font-weight: 800;
+            border-color: #bdc3c7;
         }
 
         .cell.user-input {
-            color: #667eea;
+            color: #333333;
         }
 
         .cell.selected {
             background: #f39c12;
             color: white;
+            border-color: #e67e22;
+            box-shadow: inset 0 0 0 2px #e67e22;
+            z-index: 1;
         }
 
         .cell.highlighted {
             background: #ffeaa7;
+            border-color: #f1c40f;
         }
 
         .cell.error {
             background: #e74c3c;
-            color: white;
+            color: rgb(10, 9, 9);
+            border-color: #c0392b;
             animation: shake 0.5s;
         }
 
@@ -523,13 +542,28 @@
                 const boardElement = document.getElementById('sudoku-board');
                 boardElement.innerHTML = '';
 
-                for (let row = 0; row < 9; row++) {
-                    for (let col = 0; col < 9; col++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cell';
-                        cell.dataset.row = row;
-                        cell.dataset.col = col;
-                        boardElement.appendChild(cell);
+                // 创建3x3的subgrid容器
+                for (let subgridRow = 0; subgridRow < 3; subgridRow++) {
+                    for (let subgridCol = 0; subgridCol < 3; subgridCol++) {
+                        const subgrid = document.createElement('div');
+                        subgrid.className = 'subgrid';
+                        
+                        // 在每个subgrid中创建3x3个单元格
+                        for (let cellRow = 0; cellRow < 3; cellRow++) {
+                            for (let cellCol = 0; cellCol < 3; cellCol++) {
+                                const row = subgridRow * 3 + cellRow;
+                                const col = subgridCol * 3 + cellCol;
+                                
+                                const cell = document.createElement('div');
+                                cell.className = 'cell';
+                                cell.dataset.row = row;
+                                cell.dataset.col = col;
+                                
+                                subgrid.appendChild(cell);
+                            }
+                        }
+                        
+                        boardElement.appendChild(subgrid);
                     }
                 }
             }
